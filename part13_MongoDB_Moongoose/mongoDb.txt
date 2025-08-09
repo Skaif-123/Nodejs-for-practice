@@ -1,0 +1,5 @@
+bkaif24mit
+ZZyJbaJW0THZwK4W
+mongodb+srv://bkaif24mit:
+<db_password>
+@cluster0.br3bqij.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
