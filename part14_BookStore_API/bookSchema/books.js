@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose=require("mongoose");
 const BookSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -15,10 +15,12 @@ const BookSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Year entry required"],
     min: [1000, "Year cannot be less than 1000"],
-    max: [newDate().getFullYear(), "futur timing not allowed"],
+    max: [new Date().getFullYear(), "future timing not allowed"],
   },
   createdAt: {
     type: Date,
     default: Date.now,
   },
 });
+
+module.exports=mongoose.model("Book",BookSchema);
