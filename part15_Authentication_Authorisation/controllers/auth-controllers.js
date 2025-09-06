@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/UserSchema");
-const bcrypt=require("bcrypt");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // register controller
 const registerUser = async (req, res) => {
@@ -37,7 +38,7 @@ const registerUser = async (req, res) => {
     const newUser = await User.create({
       username,
       email,
-      password:hashPassword,
+      password: hashPassword,
       role: role || "user",
     });
 
@@ -60,18 +61,64 @@ const registerUser = async (req, res) => {
     res.status(500).json({
       message: "Register unsuccesful",
     });
-    console.log("errror", error);
+    console.log("error", error);
   }
 };
 
 // login controller
 const loginUser = async (req, res) => {
   try {
+    const { username, password } = req.body;
+    const loginUserInfo = await User.findOne({ username });
+
+    /**
+     *  TODO: checking if the user exists or not
+     */
+    if (!loginUserInfo) {
+      res.json({
+        success: false,
+        message: "username not valid, user does not exist",
+      });
+    }
+    // Now user is existing, now we check the password for our user
+
+    const matchedPassword = bcrypt.compareSync(
+      password,
+      loginUserInfo.password
+    );
+    if (!matchedPassword) {
+      res.json({
+        success: false,
+        message: `Invalid credentials for  ${username}`,
+      });
+    }
+
+    /**
+     *  TODO: STORING DATA IN TOKEN
+     */
+
+    const accessToken = jwt.sign(
+      {
+        userId: loginUserInfo._id,
+        username: loginUserInfo.username,
+        role: loginUserInfo.role,
+      },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "30m",
+      }
+    );
+
+    res.json({
+      success: true,
+      message: "login successful",
+      accessToken,
+    });
   } catch (error) {
     res.status(500).json({
-      message: "Register unsuccesful",
+      message: "Register un succesful",
     });
-    console.log("errror", error);
+    console.log("error", error);
   }
 };
 
